@@ -18,6 +18,8 @@ db.connect()
 
 function startCheckingIntervals() {
 
+    checkListingUpdates();
+
     new CronJob('*/15 * * * *', checkListingUpdates, null, true, 'Europe/London');
 }
 
@@ -39,6 +41,8 @@ function setUpDb() {
 
 
 function checkListingUpdates() {
+
+    console.log('Checking for new listings...');
 
     ListingPage.find()
         .then(scrapeProperties);
