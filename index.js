@@ -128,9 +128,8 @@ function isNewProperty(propertyPage, propertyMarkup) {
 function extractProperties(pageMeta, pageMarkup) {
 
     var $ = cheerio.load(pageMarkup, {
-        normalizeWhitespace: false,
-        xmlMode: false,
-        decodeEntities: true
+        ignoreWhitespace: false,
+        decodeEntities: false
     });
 
     var propertyMarkups = [];
