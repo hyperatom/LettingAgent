@@ -7,12 +7,19 @@ var db          = require('./db')(),
     sha1        = require('sha1'),
     Q           = require('q'),
     mailer      = require('./mailer')(),
+    CronJob     = require('cron').CronJob,
     argv        = require('yargs').argv;
+
+
 
 db.connect()
     .then(setUpDb)
-    .then(checkListingUpdates);
+    .then(startCheckingIntervals);
 
+function startCheckingIntervals() {
+
+    new CronJob('*/15 * * * *', checkListingUpdates, null, true, 'Europe/London');
+}
 
 function isSeeding() {
 
@@ -33,7 +40,7 @@ function setUpDb() {
 
 function checkListingUpdates() {
 
-    return ListingPage.find()
+    ListingPage.find()
         .then(scrapeProperties);
 }
 
@@ -65,7 +72,9 @@ function scrapeProperties(pages) {
 
 function notifyNewListings(propertyPage, newListings) {
 
-    mailer.sendProperties(propertyPage.agentName, newListings)
+    if (!isSeeding()) {
+        mailer.sendProperties(propertyPage.agentName, newListings);
+    }
 }
 
 function saveNewListings(propertyPage, newListings) {
