@@ -1,6 +1,7 @@
 'use strict';
 
 var nodemailer    = require('nodemailer'),
+    logger        = require('./logger'),
     smtpTransport = require('nodemailer-smtp-transport');
 
 module.exports = function() {
@@ -28,14 +29,14 @@ module.exports = function() {
 
         var transporter = getTransporter();
 
-        console.log('Mailing properties...');
+        logger.debug('Mailing properties...');
 
         transporter.sendMail(mailOptions, function(error) {
 
             if (error) {
-                console.log(error);
+                logger.log(error);
             } else {
-                console.log(agentName + ' properties sent!');
+                logger.log(agentName + ' properties sent!');
             }
         });
     }

@@ -7,10 +7,9 @@ var db          = require('./db')(),
     sha1        = require('sha1'),
     Q           = require('q'),
     mailer      = require('./mailer')(),
-    CronJob     = require('cron').CronJob,
-    argv        = require('yargs').argv;
-
-
+    logger      = require('./logger')(),
+    env         = require('./env')(),
+    CronJob     = require('cron').CronJob;
 
 db.connect()
     .then(setUpDb)
@@ -23,16 +22,11 @@ function startCheckingIntervals() {
     new CronJob('*/15 * * * *', checkListingUpdates, null, true, 'Europe/London');
 }
 
-function isSeeding() {
-
-    return argv.seed ? true : false;
-}
-
 function setUpDb() {
 
     var defer = Q.defer().resolve();
 
-    if (isSeeding()) {
+    if (env.isSeeding()) {
         return db.reset().then(db.seed);
     }
 
@@ -42,7 +36,7 @@ function setUpDb() {
 
 function checkListingUpdates() {
 
-    console.log('Checking for new listings...');
+    logger.debug('Checking for new listings...');
 
     ListingPage.find()
         .then(scrapeProperties);
@@ -76,7 +70,7 @@ function scrapeProperties(pages) {
 
 function notifyNewListings(propertyPage, newListings) {
 
-    if (!isSeeding()) {
+    if (!env.isSeeding() && !env.isDebugging()) {
         mailer.sendProperties(propertyPage.agentName, newListings);
     }
 }
@@ -84,6 +78,13 @@ function notifyNewListings(propertyPage, newListings) {
 function saveNewListings(propertyPage, newListings) {
 
     propertyPage.properties = newListings;
+
+    if (env.isDebugging()) {
+
+        logger.debug('Saving new properties to database...');
+
+        return false;
+    }
 
     return propertyPage.save();
 }
