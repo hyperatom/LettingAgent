@@ -88,8 +88,6 @@ function saveNewListings(propertyPage, newListings) {
 
     propertyPage.properties = propertyPage.properties.concat(newListings);
 
-    console.log(newListings);
-
     return propertyPage.save();
 }
 
