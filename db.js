@@ -1,17 +1,21 @@
 'use strict';
 
-var mongoose          = require('mongoose'),
-    ListingPage       = require('./models/listingPage/listingPage.model'),
-    listingPageSeeds  = require('./seeds/listingpages.seed.js'),
-    Q                 = require('q');
+var mongoose    = require('mongoose'),
+    ListingPage = require('./models/listingPage/listingPage.model'),
+    data        = require('./data')(),
+    config      = require('./config')(),
+    logger      = require('./logger')(),
+    Q           = require('q');
 
 module.exports = function() {
 
     function connect() {
 
+        logger.debug('Connecting to database...');
+
         var defer = Q.defer();
 
-        mongoose.connect('mongodb://agent:lettingagent@ds055772.mongolab.com:55772/letting-agent');
+        mongoose.connect(getConnectionString());
 
         var db = mongoose.connection;
 
@@ -21,16 +25,28 @@ module.exports = function() {
         return defer.promise;
     }
 
+    function getConnectionString() {
+
+        var dbConfig = config.getConfig('db');
+
+        return dbConfig.protocol + '://' + dbConfig.user + ':' + dbConfig.pass + '@' + dbConfig.host;
+    }
+
     function seed() {
 
-        var defer = Q.defer();
+        logger.debug('Seeding database...');
 
-        ListingPage.collection.insert(listingPageSeeds, defer.resolve);
+        var defer       = Q.defer(),
+            listingSeed = data.getSeed('listingpages');
+
+        ListingPage.collection.insert(listingSeed, defer.resolve);
 
         return defer.promise;
     }
 
     function reset() {
+
+        logger.debug('Resetting database...');
 
         var defer = Q.defer();
 

@@ -1,8 +1,10 @@
 'use strict';
 
 var nodemailer    = require('nodemailer'),
-    logger        = require('./logger'),
-    smtpTransport = require('nodemailer-smtp-transport');
+    smtpTransport = require('nodemailer-smtp-transport'),
+    logger        = require('./logger')(),
+    env           = require('./env')(),
+    config        = require('./config')();
 
 module.exports = function() {
 
@@ -27,18 +29,23 @@ module.exports = function() {
             html:    emailContent
         };
 
-        var transporter = getTransporter();
+        if (env.isDebugging()) {
 
-        logger.debug('Mailing properties...');
+            logger.debug('Mailing properties...\n\n' + emailContent);
 
-        transporter.sendMail(mailOptions, function(error) {
+        } else {
 
-            if (error) {
-                logger.log(error);
-            } else {
-                logger.log(agentName + ' properties sent!');
-            }
-        });
+            var transporter = getTransporter();
+
+            transporter.sendMail(mailOptions, catchSendMailError);
+        }
+    }
+
+    function catchSendMailError(errorMessage) {
+
+        if (errorMessage) {
+            logger.log(errorMessage);
+        }
     }
 
     function concatListingMarkups(newListingsMarkup) {
@@ -56,14 +63,16 @@ module.exports = function() {
 
     function getTransporter() {
 
+        var mailConfig = config.getConfig('mail');
+
         return nodemailer.createTransport(smtpTransport({
-            host: 'adambarrell.co.uk',
-            port: 25,
+            host: mailConfig.host,
+            port: mailConfig.port,
             secure: false,
             ignoreTLS: true,
             auth: {
-                user: 'adam@adambarrell.co.uk',
-                pass: 'lettingagent'
+                user: mailConfig.user,
+                pass: mailConfig.pass
             }
         }));
     }

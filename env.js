@@ -14,8 +14,18 @@ module.exports = function() {
         return argv.debug ? true : false;
     }
 
+    function getEnvironmentName() {
+
+        if (isDebugging()) {
+            return 'debug';
+        }
+
+        return 'live';
+    }
+
     return {
-        isDebugging: isDebugging,
-        isSeeding:   isSeeding
+        getEnvironmentName: getEnvironmentName,
+        isDebugging:        isDebugging,
+        isSeeding:          isSeeding
     };
 };

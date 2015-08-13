@@ -15,11 +15,17 @@ db.connect()
     .then(setUpDb)
     .then(startCheckingIntervals);
 
+
 function startCheckingIntervals() {
 
-    checkListingUpdates();
+    if (env.isDebugging()) {
 
-    new CronJob('*/15 * * * *', checkListingUpdates, null, true, 'Europe/London');
+        checkListingUpdates();
+
+    } else {
+
+        new CronJob('*/15 * * * *', checkListingUpdates, null, true, 'Europe/London');
+    }
 }
 
 function setUpDb() {
@@ -70,21 +76,19 @@ function scrapeProperties(pages) {
 
 function notifyNewListings(propertyPage, newListings) {
 
-    if (!env.isSeeding() && !env.isDebugging()) {
+    if (!env.isSeeding()) {
+
         mailer.sendProperties(propertyPage.agentName, newListings);
     }
 }
 
 function saveNewListings(propertyPage, newListings) {
 
-    propertyPage.properties = newListings;
+    logger.debug('Saving new properties to database...');
 
-    if (env.isDebugging()) {
+    propertyPage.properties = propertyPage.properties.concat(newListings);
 
-        logger.debug('Saving new properties to database...');
-
-        return false;
-    }
+    console.log(newListings);
 
     return propertyPage.save();
 }
