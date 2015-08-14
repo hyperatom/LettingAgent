@@ -1,15 +1,16 @@
 'use strict';
 
-var db          = require('./db')(),
-    ListingPage = require('./models/listingPage/listingPage.model'),
-    cheerio     = require('cheerio'),
-    request     = require('request'),
-    sha1        = require('sha1'),
-    Q           = require('q'),
-    mailer      = require('./mailer')(),
-    logger      = require('./logger')(),
-    env         = require('./env')(),
-    CronJob     = require('cron').CronJob;
+var db           = require('./db')(),
+    ListingPage  = require('./models/listingPage/listingPage.model'),
+    cheerio      = require('cheerio'),
+    request      = require('request'),
+    sha1         = require('sha1'),
+    Q            = require('q'),
+    mailer       = require('./mailer')(),
+    logger       = require('./logger')(),
+    urlRelocator = require('./urlRelocator')(),
+    env          = require('./env')(),
+    CronJob      = require('cron').CronJob;
 
 db.connect()
     .then(setUpDb)
@@ -130,7 +131,9 @@ function isNewProperty(propertyPage, propertyMarkup) {
 
 function extractProperties(pageMeta, pageMarkup) {
 
-    var $ = cheerio.load(pageMarkup, {
+    var urlRelocatedMarkup = urlRelocator.relativeToAbsolute(pageMeta.url ,pageMarkup);
+
+    var $ = cheerio.load(urlRelocatedMarkup, {
         ignoreWhitespace: false,
         decodeEntities: false
     });
