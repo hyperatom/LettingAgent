@@ -20,11 +20,9 @@ db.connect()
 
 function startCheckingIntervals() {
 
-    if (env.isDebugging()) {
+    checkListingUpdates();
 
-        checkListingUpdates();
-
-    } else {
+    if (!env.isDebugging()) {
 
         new CronJob('*/15 * * * *', checkListingUpdates, null, true, 'Europe/London');
     }
