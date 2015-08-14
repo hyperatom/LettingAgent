@@ -157,8 +157,8 @@ function processPageMarkup(pageUrl, pageMarkup) {
 function extractProperties(pageMeta, pageMarkup) {
 
     var $ = cheerio.load(pageMarkup, {
-        ignoreWhitespace: false,
-        decodeEntities: false
+        ignoreWhitespace: true,
+        decodeEntities: true
     });
 
     var propertyMarkups = [];
