@@ -6,6 +6,7 @@ var db           = require('./db')(),
     request      = require('request'),
     sha1         = require('sha1'),
     Q            = require('q'),
+    juice        = require('juice'),
     mailer       = require('./mailer')(),
     logger       = require('./logger')(),
     urlRelocator = require('./urlRelocator')(),
@@ -61,17 +62,24 @@ function scrapeProperties(pages) {
 
                 if (!error) {
 
-                    var properties  = extractProperties(propertyPage, body),
-                        newListings = getNewListings(propertyPage, properties);
-
-                    if (newListings.length > 0) {
-                        saveNewListings(propertyPage, newListings);
-                        notifyNewListings(propertyPage, newListings);
-                    }
+                    extractProperties(propertyPage, body)
+                        .then(function(properties) {
+                            checkForNewListings(propertyPage, properties);
+                        });
                 }
             });
 
         })(propertyPage);
+    }
+}
+
+function checkForNewListings(propertyPage, properties) {
+
+    var newListings = getNewListings(propertyPage, properties);
+
+    if (newListings.length > 0) {
+        saveNewListings(propertyPage, newListings);
+        notifyNewListings(propertyPage, newListings);
     }
 }
 
@@ -131,6 +139,8 @@ function isNewProperty(propertyPage, propertyMarkup) {
 
 function extractProperties(pageMeta, pageMarkup) {
 
+    var defer = Q.defer();
+
     var urlRelocatedMarkup = urlRelocator.relativeToAbsolute(pageMeta.url ,pageMarkup);
 
     var $ = cheerio.load(urlRelocatedMarkup, {
@@ -144,5 +154,7 @@ function extractProperties(pageMeta, pageMarkup) {
         propertyMarkups.push($(elem).html());
     });
 
-    return propertyMarkups;
+    defer.resolve(propertyMarkups);
+
+    return defer.promise;
 }
