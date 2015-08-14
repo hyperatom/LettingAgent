@@ -6,7 +6,7 @@ var db           = require('./db')(),
     request      = require('request'),
     sha1         = require('sha1'),
     Q            = require('q'),
-    juice        = require('juice'),
+    Styliner     = require('styliner'),
     mailer       = require('./mailer')(),
     logger       = require('./logger')(),
     urlRelocator = require('./urlRelocator')(),
@@ -62,8 +62,11 @@ function scrapeProperties(pages) {
 
                 if (!error) {
 
-                    extractProperties(propertyPage, body)
-                        .then(function(properties) {
+                    processPageMarkup(propertyPage.url, body)
+                        .then(function(processedHtml) {
+
+                            var properties = extractProperties(propertyPage, processedHtml);
+
                             checkForNewListings(propertyPage, properties);
                         });
                 }
@@ -137,13 +140,16 @@ function isNewProperty(propertyPage, propertyMarkup) {
     return true;
 }
 
+function processPageMarkup(pageUrl, pageMarkup) {
+
+    var urlRelocatedMarkup = urlRelocator.relativeToAbsolute(pageUrl, pageMarkup);
+
+    return new Styliner().processHTML(urlRelocatedMarkup, pageUrl);
+}
+
 function extractProperties(pageMeta, pageMarkup) {
 
-    var defer = Q.defer();
-
-    var urlRelocatedMarkup = urlRelocator.relativeToAbsolute(pageMeta.url ,pageMarkup);
-
-    var $ = cheerio.load(urlRelocatedMarkup, {
+    var $ = cheerio.load(pageMarkup, {
         ignoreWhitespace: false,
         decodeEntities: false
     });
@@ -154,7 +160,5 @@ function extractProperties(pageMeta, pageMarkup) {
         propertyMarkups.push($(elem).html());
     });
 
-    defer.resolve(propertyMarkups);
-
-    return defer.promise;
+    return propertyMarkups;
 }
