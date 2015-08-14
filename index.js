@@ -6,7 +6,7 @@ var db           = require('./db')(),
     request      = require('request'),
     sha1         = require('sha1'),
     Q            = require('q'),
-    Styliner     = require('styliner'),
+    juice        = require('juice2'),
     mailer       = require('./mailer')(),
     logger       = require('./logger')(),
     urlRelocator = require('./urlRelocator')(),
@@ -142,9 +142,16 @@ function isNewProperty(propertyPage, propertyMarkup) {
 
 function processPageMarkup(pageUrl, pageMarkup) {
 
+    var defer = Q.defer();
+
     var urlRelocatedMarkup = urlRelocator.relativeToAbsolute(pageUrl, pageMarkup);
 
-    return new Styliner().processHTML(urlRelocatedMarkup, pageUrl);
+    juice.juiceContent(urlRelocatedMarkup, { url: pageUrl }, function(err, html) {
+
+        defer.resolve(html);
+    });
+
+    return defer.promise;
 }
 
 function extractProperties(pageMeta, pageMarkup) {
