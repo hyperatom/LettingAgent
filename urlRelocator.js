@@ -9,7 +9,7 @@ module.exports = function() {
 
         var $ = cheerio.load(pageMarkup);
 
-        var tagsToUpdate  = ['a', 'img'],
+        var tagsToUpdate  = ['a', 'img', 'link'],
             elemsToUpdate = getElementsToUpdate($, tagsToUpdate);
 
         elemsToUpdate.each(function() {
