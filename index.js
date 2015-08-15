@@ -111,9 +111,11 @@ function getNewListings(propertyPage, propertyList) {
 
         if (isNewProperty(propertyPage, propertyMarkup)) {
 
+            var contentHash = getMarkupContentHash(propertyMarkup);
+
             newListings.push({
                 content: propertyMarkup,
-                contentHash: sha1(propertyMarkup)
+                contentHash: contentHash
             });
         }
     }
@@ -121,10 +123,18 @@ function getNewListings(propertyPage, propertyList) {
     return newListings;
 }
 
+function getMarkupContentHash(propertyMarkup) {
+
+    var propertyText           = cheerio(propertyMarkup).text(),
+        strippedWhitespaceText = propertyText.replace(/ /g,'');
+
+    return sha1(strippedWhitespaceText);
+}
+
 function isNewProperty(propertyPage, propertyMarkup) {
 
     var knownProperties = propertyPage.properties,
-        markupHash      = sha1(propertyMarkup);
+        markupHash      = getMarkupContentHash(propertyMarkup);
 
     for (var i = 0; i < knownProperties.length; i++) {
 
