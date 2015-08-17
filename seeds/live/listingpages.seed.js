@@ -16,7 +16,7 @@ module.exports = [
     {
         agentName: 'Adam Barrell',
         url: 'http://stage.adambarrell.co.uk/',
-        entryLocator: '.results',
+        entryLocator: '.row',
         properties: []
     }
 ];
