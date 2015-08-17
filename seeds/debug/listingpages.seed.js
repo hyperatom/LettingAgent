@@ -12,5 +12,11 @@ module.exports = [
         url: 'http://www.sarahkennyresidentiallettings.co.uk/search-results/?maxRent=2&minBeds=0&propRef&submit=Search',
         entryLocator: '.search-results',
         properties: []
+    },
+    {
+        agentName: 'Adam Barrell',
+        url: 'http://stage.adambarrell.co.uk/',
+        entryLocator: '.row',
+        properties: []
     }
 ];
