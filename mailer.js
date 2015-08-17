@@ -70,6 +70,7 @@ module.exports = function() {
             port: mailConfig.port,
             secure: false,
             ignoreTLS: true,
+            greetingTimeout: '10000',
             auth: {
                 user: mailConfig.user,
                 pass: mailConfig.pass
