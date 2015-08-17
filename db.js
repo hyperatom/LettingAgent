@@ -11,7 +11,7 @@ module.exports = function() {
 
     function connect() {
 
-        logger.debug('Connecting to database...');
+        logger.log('Connecting to database...');
 
         var defer = Q.defer();
 
@@ -34,7 +34,7 @@ module.exports = function() {
 
     function seed() {
 
-        logger.debug('Seeding database...');
+        logger.log('Seeding database...');
 
         var defer       = Q.defer(),
             listingSeed = data.getSeed('listingpages');
@@ -46,7 +46,7 @@ module.exports = function() {
 
     function reset() {
 
-        logger.debug('Resetting database...');
+        logger.log('Resetting database...');
 
         var defer = Q.defer();
 

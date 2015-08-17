@@ -42,7 +42,7 @@ function setUpDb() {
 
 function checkListingUpdates() {
 
-    logger.debug('Checking for new listings...');
+    logger.log('Checking for new listings...');
 
     ListingPage.find()
         .then(scrapeProperties);
@@ -94,7 +94,7 @@ function notifyNewListings(propertyPage, newListings) {
 
 function saveNewListings(propertyPage, newListings) {
 
-    logger.debug('Saving new properties to database...');
+    logger.log('Saving new properties to database...');
 
     propertyPage.properties = propertyPage.properties.concat(newListings);
 

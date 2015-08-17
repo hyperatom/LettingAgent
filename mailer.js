@@ -31,7 +31,7 @@ module.exports = function() {
 
         if (env.isDebugging()) {
 
-            logger.debug('Mailing properties...\n\n' + emailContent);
+            logger.log('Mailing new properties...');
 
         } else {
 

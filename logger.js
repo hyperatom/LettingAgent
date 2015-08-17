@@ -6,7 +6,7 @@ module.exports = function() {
 
     function log(message) {
 
-        console.log(message);
+        console.log(getCurrentDateTime() + ':', message);
     }
 
     function debug(message) {
@@ -14,6 +14,13 @@ module.exports = function() {
         if (argv.debug) {
             console.log(message);
         }
+    }
+
+    function getCurrentDateTime() {
+
+        return new Date().toISOString().
+            replace(/T/, ' ').
+            replace(/\..+/, '');
     }
 
     return {
