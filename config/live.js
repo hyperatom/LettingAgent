@@ -10,7 +10,7 @@ module.exports = {
     },
 
     mail: {
-        host: 'adambarrell.co.uk',
+        host: '127.0.0.1',
         port: 25,
         user: 'adam@adambarrell.co.uk',
         pass: 'lettingagent'
